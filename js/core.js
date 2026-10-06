@@ -9,6 +9,12 @@
       return Date.parse(b.createdAt) - Date.parse(a.createdAt);
     });
   }
+  /* 首页只展示最新的若干条，避免信息堆积后列表过长。 */
+  const homeLimit = 30;
+  function homeItems(items, type) {
+    const sorted = filterItems(items, type);
+    return { items: sorted.slice(0, homeLimit), total: sorted.length, limit: homeLimit };
+  }
   function statusLabel(item) {
     if (item.status === 'completed') return item.type === 'lost' ? '已找回' : '已归还';
     return item.type === 'lost' ? '待寻找' : '待认领';
@@ -105,7 +111,7 @@
     editableItem(items, id);
     return items.filter(item => item.id !== id);
   }
-  const api = { categories, filterItems, statusLabel, normalizeInput, validatePost, createPost, searchItems, findItem, myItems, mySummary, changeStatus, editPost, deletePost };
+  const api = { categories, homeLimit, homeItems, filterItems, statusLabel, normalizeInput, validatePost, createPost, searchItems, findItem, myItems, mySummary, changeStatus, editPost, deletePost };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.LostFoundCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
