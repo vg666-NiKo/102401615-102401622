@@ -48,12 +48,20 @@
     return card;
   }
   function renderHome() {
-    const visible = core.filterItems(items, homeFilter);
+    const shown = core.homeItems(items, homeFilter);
     const list = document.getElementById('home-list');
     list.replaceChildren();
-    document.getElementById('result-count').textContent = '共 ' + visible.length + ' 条';
-    if (!visible.length) list.append(element('p', 'empty-state', '暂无相关信息'));
-    else visible.forEach(function (item) { list.append(createCard(item)); });
+    const clipped = shown.total > shown.limit;
+    document.getElementById('result-count').textContent = clipped
+      ? '共 ' + shown.total + ' 条，显示最新 ' + shown.items.length + ' 条'
+      : '共 ' + shown.total + ' 条';
+    const hint = document.getElementById('home-limit-hint');
+    hint.textContent = clipped
+      ? '首页只显示最新 ' + shown.limit + ' 条，其余 ' + (shown.total - shown.items.length) + ' 条请用「搜索」查找。'
+      : '';
+    hint.hidden = !clipped;
+    if (!shown.items.length) list.append(element('p', 'empty-state', '暂无相关信息'));
+    else shown.items.forEach(function (item) { list.append(createCard(item)); });
   }
   function navigate(page) {
     if (!['home', 'search', 'publish', 'mine', 'detail'].includes(page)) return;
